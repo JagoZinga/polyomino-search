@@ -1,31 +1,31 @@
-// Exact Z input for fools25.js
-
 const exactZObserver = new MutationObserver(() => {
-    const z = document.getElementById("modulatorZ");
+    const slider = document.getElementById("modulatorZ");
+    if (!slider || document.getElementById("z88button")) return;
 
-    if (z && z.type === "range") {
-        z.type = "number";
-        z.min = "1";
-        z.max = "500";
-        z.step = "1";
-        z.style.width = "6em";
+    const button = document.createElement("button");
+    button.id = "z88button";
+    button.textContent = "Set Z = 88";
 
-        z.oninput = function () {
-            const value = Math.max(1, Math.min(500, Number(this.value) || 1));
-            
-            const text = document.getElementById("modulatorTextZ");
-            if (text) text.innerText = value;
+    button.onclick = () => {
+        slider.value = 88;
 
-            const modulator = document.getElementById("modulator");
-            if (modulator) {
-                modulator.style.filter =
-                    `hue-rotate(${value % 359}deg)`;
-            }
-        };
-    }
+        const text = document.getElementById("modulatorTextZ");
+        if (text) text.innerText = "88";
+
+        if (currentModulatorPos) {
+            currentModulatorPos[2] = 88;
+        }
+
+        const canvas = document.getElementById("modulator");
+        if (canvas) {
+            canvas.style.filter = "hue-rotate(88deg)";
+        }
+    };
+
+    slider.after(button);
 });
 
-exactZObserver.observe(document.documentElement, {
+exactZObserver.observe(document.body, {
     childList: true,
     subtree: true
 });
