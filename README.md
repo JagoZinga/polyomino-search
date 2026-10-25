@@ -11,6 +11,20 @@ including diagonals. A class such as `1/2/4` requires exactly those labels, each
 appearing the same positive number of times. The 79 classes in the request are
 built in as the default target set.
 
+## Download for Windows (no compiler required)
+
+Download [polyomino-search-windows-x64.zip](https://github.com/JagoZinga/polyomino-search/releases/latest/download/polyomino-search-windows-x64.zip).
+Extract the ZIP and open the extracted `polyomino-search` folder. Type `cmd` in
+File Explorer's address bar and press Enter. Then run:
+
+```bat
+polyomino-search.exe --threads 4 --seconds 300
+```
+
+Alternatively, double-click `Open Command Prompt.cmd` in that folder. The ZIP
+includes a standalone Windows x64 executable, instructions and example witnesses.
+No compiler or installation is needed. Source build instructions follow below.
+
 ## Build and run
 
 Requires a C++20 compiler and threads; no third-party libraries or network services.

@@ -1,5 +1,6 @@
 """Independent small-shape oracle, proof-scope checks, CLI and witness validation."""
 import json
+import os
 import pathlib
 import subprocess
 import sys
@@ -175,12 +176,12 @@ class Tests(unittest.TestCase):
         for e in witnesses:
             self.assertEqual(len(e['cells']), len(set(map(tuple, e['cells']))))
             self.assertEqual(classify(e['cells']), (e['target'], e['each']))
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt') as f:
-                for x, y in e['cells']:
-                    f.write(f'{x} {y}\n')
-                f.flush()
-                self.assertIn('VALID target='+e['target']+' ', run('--verify', f.name).stdout)
+            with tempfile.TemporaryDirectory() as temp:
+                path = pathlib.Path(temp)/'shape.txt'
+                path.write_text(''.join(f'{x} {y}\n' for x, y in e['cells']))
+                self.assertIn('VALID target='+e['target']+' ', run('--verify', path).stdout)
 
+    @unittest.skipIf(os.name == 'nt', 'POSIX SIGINT delivery; Windows uses console Ctrl-C')
     def test_signal_preserves_unknown(self):
         import signal
         import time

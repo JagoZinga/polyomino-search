@@ -1,0 +1,39 @@
+name: Windows portable executable
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'windows-v*'
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure standalone executable
+        run: cmake -S . -B build -A x64 -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release --parallel 2
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
+      - name: Package portable ZIP
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist/polyomino-search/examples | Out-Null
+          Copy-Item build/Release/polyomino-search.exe dist/polyomino-search/
+          Copy-Item packaging/README-WINDOWS.txt dist/polyomino-search/
+          Copy-Item 'packaging/Open Command Prompt.cmd' dist/polyomino-search/
+          Copy-Item examples/witnesses.json dist/polyomino-search/examples/
+          Compress-Archive -Path dist/polyomino-search -DestinationPath polyomino-search-windows-x64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: polyomino-search-windows-x64
+          path: polyomino-search-windows-x64.zip
+      - name: Publish downloadable ZIP
+        if: startsWith(github.ref, 'refs/tags/windows-v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$env:GITHUB_REF_NAME" polyomino-search-windows-x64.zip --title "Windows portable command-line app ($env:GITHUB_REF_NAME)" --notes-file packaging/RELEASE-NOTES.md
